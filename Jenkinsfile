@@ -15,7 +15,7 @@ pipeline {
         '''
 
         // Run the new "hello" image as a container named hello-app
-        sh 'docker run -d --name hello-app -p 8000:8000 hello'
+        sh 'docker run -d --name hello-app -p 9000:8000 hello'
       }
     }
   }
