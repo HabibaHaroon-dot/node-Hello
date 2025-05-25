@@ -1,28 +1,51 @@
 pipeline {
   agent any
-
-  stages {
-    stage('Build & Deploy') {
-      steps {
-        // Build the image named "hello"
-        sh 'docker build -t hello .'
-
-        // Stop & remove any existing container named hello-app
-        sh '''
-          if [ "$(docker ps -q -f name=hello-app)" ]; then
-            docker rm -f hello-app
-          fi
-        '''
-
-        // Run the new "hello" image as a container named hello-app
-        sh 'docker run -d --name node-hello -p 9000:8000 hello'
-      }
-    }
+  environment {
+    REGISTRY   = 'docker.io/habibaharoon'
+    IMAGE      = "${REGISTRY}/node-hello"
+    TAG        = "build-${env.BUILD_NUMBER}"
   }
 
-  post {
-    always {
-      cleanWs()
+  stages {
+    stage('Checkout')   { steps { checkout scm } }
+
+    stage('Install')    { steps { sh 'npm ci' } }
+
+    stage('Lint')       { steps { sh 'npm run lint' } }
+
+    stage('Unit Test')  { steps { sh 'npm test' } }
+
+    stage('Build Image & Push') {
+      steps {
+        script {
+          docker.withRegistry('https://index.docker.io/v1/', 'docker-hub') {
+            def img = docker.build("${IMAGE}:${TAG}")
+            img.push()
+            img.push('latest')
+          }
+        }
+      }
+    }
+
+    stage('Deploy to EC2') {
+      steps {
+        sshagent(credentials: ['ec2-ssh']) {
+          sh """
+            ssh -o StrictHostKeyChecking=no ubuntu@${DEPLOY_HOST} '
+              docker pull ${IMAGE}:${TAG} &&
+              docker compose -f docker-compose.yml down || true &&
+              docker compose -f docker-compose.yml up -d'
+          """
+        }
+      }
+    }
+
+    stage('Selenium E2E') {
+      steps {
+        withEnv(["APP_IMAGE=${IMAGE}:${TAG}"]) {
+          sh 'docker compose -f docker-compose.e2e.yml up --abort-on-container-exit --exit-code-from tester'
+        }
+      }
     }
   }
 }
