@@ -9,7 +9,7 @@ pipeline {
   stages {
     stage('Checkout')   { steps { checkout scm } }
 
-    stage('Install')    { steps { sh 'npm ci' } }
+    stage('Install')    { steps { sh 'npm install --no-audit --no-fund' } }
 
     stage('Lint')       { steps { sh 'npm run lint' } }
 
