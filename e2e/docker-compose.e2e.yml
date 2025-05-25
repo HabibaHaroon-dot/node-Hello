@@ -1,0 +1,16 @@
+version: '3.8'
+services:
+  web:
+    image: ${APP_IMAGE:-habiba/node-hello}:latest
+    environment:
+      - MONGO_URL=mongodb://mongo:27017/sample
+  mongo:
+    image: mongo:7
+  selenium:
+    image: selenium/standalone-chrome:4.20
+    shm_size: 2g
+  tester:
+    build: ./e2e
+    depends_on: [web, selenium]
+    environment:
+      - SUT_URL=http://web:3000
