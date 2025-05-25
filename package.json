@@ -28,7 +28,7 @@
   "eslint-plugin-promise": "^6.1.1",
   "jest": "^29.7.0",
   "nodemon": "^3.1.0",
-  "supertest": "^6.3.3",        // <-- fixed
+  "supertest": "^6.3.3",      
   "selenium-webdriver": "^4.20.0"
 }
 
