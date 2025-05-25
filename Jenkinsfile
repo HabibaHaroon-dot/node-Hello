@@ -31,7 +31,7 @@ pipeline {
       steps {
         sshagent(credentials: ['ec2-ssh']) {
           sh """
-            ssh -o StrictHostKeyChecking=no ubuntu@${54.221.149.15} '
+            ssh -o StrictHostKeyChecking=no ubuntu@${3.90.218.57} '
               docker pull ${IMAGE}:${TAG} &&
               docker compose -f docker-compose.yml down || true &&
               docker compose -f docker-compose.yml up -d'
