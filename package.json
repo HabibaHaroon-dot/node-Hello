@@ -4,8 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node server.js"
-  },
+    "start":"node server.js",
+    "dev":   "nodemon server.js",
+    "lint":  "eslint .",
+    "build": "echo 'nothing to build yet'",
+    "test":  "jest --coverage"
+}
+
   "repository": {
     "type": "git",
     "url": "git+https://github.com/johnpapa/node-hello.git"
